@@ -1,8 +1,12 @@
 const express = require('express');
 const {graphqlHTTP}  = require('express-graphql');
+const cors = require('cors');
 const schema  = require('./schema');
-
+const path = require('path'); //for deployment
 const app = express();
+
+//Allow cross-origin
+app.use(cors());
 
 app.use(
     '/graphql', 
@@ -11,6 +15,12 @@ app.use(
     graphiql: true
 }),
 );
+
+app.use(express.static('public'));//set up static folder
+
+app.get('*', (req, res)=>{
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+}) //any other route than /graphql it will redirect to index.html page of client
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, ()=> console.log(`Server started on port ${PORT}`))
